@@ -2,6 +2,8 @@
 import tkinter as tk
 from tkinter import ttk
 import random
+import time
+
 
 def get_random_name():
     with open('resources/names.txt', 'r', encoding='utf-8') as f:
@@ -11,11 +13,60 @@ def get_random_name():
         return name
 
 
+def roll3d6():
+    d1 = random.randint(1, 6)
+    d2 = random.randint(1, 6)
+    d3 = random.randint(1, 6)
+    return d1 + d2 + d3
+
+
+def roll1d20():
+    d1 = random.randint(1, 20)
+    return d1
+
+
+class Player:
+    def __init__(self, name):
+        self.name = name
+        self.attack = PlayerAttribute("Attack")
+        self.defense = PlayerAttribute("Defense")
+        self.armor = PlayerAttribute("Armor")
+        self.power = PlayerAttribute("Power")
+        self.speed = PlayerAttribute("Speed")
+        self.range = PlayerAttribute("Range")
+
+    def __str__(self):
+        return f"{self.name}, Atk={self.attack}, Def={self.defense}"
+
+    def randomize(self):
+        self.attack.set(roll3d6())
+        self.defense.set(roll3d6())
+        self.armor.set(roll3d6())
+        self.power.set(roll3d6())
+        self.speed.set(roll3d6())
+        self.range.set(roll3d6())
+    
+
+class PlayerAttribute:
+    def __init__(self, name, cv=0, bv=0):
+        self.name = name
+        self.current_value = cv
+        self.base_value = bv
+
+    def set(self, base_value):
+        self.base_value = base_value
+        self.current_value = base_value
+
+    def __str__(self):
+        return f"{self.current_value}"
+
+
 class BattleWindow:
     def __init__(self, root):
         self.root = root
         self.root.title("battle 2.0")
         self.create_widgets()
+        self.players = []
         
     def create_widgets(self):
         # Create toolbar with 3 buttons
@@ -26,11 +77,11 @@ class BattleWindow:
         self.add_btn = ttk.Button(toolbar, text="Add Player", command=self.add_player)
         self.add_btn.pack(side=tk.LEFT, padx=2, pady=2)
         
-        self.open_btn = ttk.Button(toolbar, text="Randomize", command=self.open_file)
-        self.open_btn.pack(side=tk.LEFT, padx=2, pady=2)
+        self.rand_btn = ttk.Button(toolbar, text="Randomize", command=self.randomize)
+        self.rand_btn.pack(side=tk.LEFT, padx=2, pady=2)
         
-        self.save_btn = ttk.Button(toolbar, text="Run!", command=self.save_file)
-        self.save_btn.pack(side=tk.LEFT, padx=2, pady=2)
+        self.run_btn = ttk.Button(toolbar, text="Run!", command=self.runsim)
+        self.run_btn.pack(side=tk.LEFT, padx=2, pady=2)
 
         self.new_btn = ttk.Button(toolbar, text="New Game", command=self.new_game)
         self.new_btn.pack(side=tk.RIGHT, padx=2, pady=2)
@@ -58,28 +109,40 @@ class BattleWindow:
         
     def add_player(self):
         name = get_random_name()
+        self.players.append(Player(name))
         self.text.config(state='normal')
         self.text.insert(tk.END, f"{name}\n")
         self.text.see(tk.END)
         self.text.config(state='disabled')
         self.update_status(f"New belligerent {name}, created")
         
-    def open_file(self):
-        self.update_status("Open file dialog would appear here")
+    def randomize(self):
+        self.update_status("Randomizing the players attributes...")
+        for player in self.players:
+            player.randomize()
         
-    def save_file(self):
-        self.update_status("Save file dialog would appear here")
-        
+    def runsim(self):
+        self.update_status("Running simulation...")
+        self.text.config(state='normal')
+        for player in self.players:
+            self.text.insert(tk.END, f"{player}\n")
+            self.text.see(tk.END)
+        self.text.config(state='disabled')
+
     def update_status(self, message):
         self.status.config(text=message)
         self.root.after(3000, lambda: self.status.config(text="Ready"))
 
     def new_game(self):
+        self.players = []
+        self.text.config(state='normal')
         self.text.delete(1.0, tk.END)
+        self.text.config(state='disabled')
         self.update_status("New simulation created")
 
 
 def main():
+    random.seed(time.time())
     root = tk.Tk()
     app = BattleWindow(root)
     root.geometry("1024x768")
