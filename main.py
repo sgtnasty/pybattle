@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 import random
 import time
+import math
 
 
 def get_random_name():
@@ -36,7 +37,7 @@ class Player:
         self.range = PlayerAttribute("Range")
 
     def __str__(self):
-        return f"{self.name}, Atk={self.attack}, Def={self.defense}"
+        return f"{self.name}, Atk={self.attack}, Def={self.defense}, Loc=[{self.location}]"
 
     def randomize(self):
         self.attack.set(roll3d6())
@@ -45,6 +46,8 @@ class Player:
         self.power.set(roll3d6())
         self.speed.set(roll3d6())
         self.range.set(roll3d6())
+        self.location = Location()
+        self.location.randomize()
     
 
 class PlayerAttribute:
@@ -59,6 +62,27 @@ class PlayerAttribute:
 
     def __str__(self):
         return f"{self.current_value}"
+
+
+class Location:
+    def __init__(self, x=0.0, y=0.0, z=0.0):
+        self.x = x
+        self.y = y
+        self.z = z
+
+    def distance(self, source):
+        dx = self.x - source.x
+        dy = self.y - source.y
+        dz = self.z - source.z
+        return math.sqrt(dx**2 + dy**2 + dz**2)
+
+    def randomize(self):
+        self.x = float(roll3d6() + roll3d6() + roll3d6())
+        self.y = float(roll3d6() + roll3d6() + roll3d6())
+        self.z = 0.0
+
+    def __str__(self):
+        return f"x{self.x}, y{self.y}"
 
 
 class BattleWindow:
