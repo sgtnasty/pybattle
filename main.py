@@ -1,6 +1,15 @@
 
 import tkinter as tk
 from tkinter import ttk
+import random
+
+def get_random_name():
+    with open('resources/names.txt', 'r', encoding='utf-8') as f:
+        content = f.read()
+        names = content.split(" ")
+        name = random.choice(names)
+        return name
+
 
 class BattleWindow:
     def __init__(self, root):
@@ -48,14 +57,12 @@ class BattleWindow:
         self.status.pack(side=tk.BOTTOM, fill=tk.X)
         
     def add_player(self):
-        # self.text.delete(1.0, tk.END)
-        with open('resources/names.txt', 'r', encoding='utf-8') as f:
-            content = f.read()
-            self.text.config(state='normal')
-            self.text.insert(tk.END, content)
-            self.text.see(tk.END)
-            self.text.config(state='disabled')
-        self.update_status("New belligerent created")
+        name = get_random_name()
+        self.text.config(state='normal')
+        self.text.insert(tk.END, f"{name}\n")
+        self.text.see(tk.END)
+        self.text.config(state='disabled')
+        self.update_status(f"New belligerent {name}, created")
         
     def open_file(self):
         self.update_status("Open file dialog would appear here")
