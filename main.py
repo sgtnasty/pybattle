@@ -14,14 +14,17 @@ class BattleWindow:
         toolbar.pack(side=tk.TOP, fill=tk.X)
         
         # Toolbar buttons
-        self.new_btn = ttk.Button(toolbar, text="Add Player", command=self.new_file)
-        self.new_btn.pack(side=tk.LEFT, padx=2, pady=2)
+        self.add_btn = ttk.Button(toolbar, text="Add Player", command=self.add_player)
+        self.add_btn.pack(side=tk.LEFT, padx=2, pady=2)
         
         self.open_btn = ttk.Button(toolbar, text="Randomize", command=self.open_file)
         self.open_btn.pack(side=tk.LEFT, padx=2, pady=2)
         
         self.save_btn = ttk.Button(toolbar, text="Run!", command=self.save_file)
         self.save_btn.pack(side=tk.LEFT, padx=2, pady=2)
+
+        self.new_btn = ttk.Button(toolbar, text="New Game", command=self.new_game)
+        self.new_btn.pack(side=tk.RIGHT, padx=2, pady=2)
         
         # Text widget in the center (with scrollbar)
         text_frame = tk.Frame(self.root)
@@ -44,9 +47,15 @@ class BattleWindow:
         self.status = tk.Label(self.root, text="Ready", bd=1, relief=tk.SUNKEN, anchor=tk.W)
         self.status.pack(side=tk.BOTTOM, fill=tk.X)
         
-    def new_file(self):
-        self.text.delete(1.0, tk.END)
-        self.update_status("New file created")
+    def add_player(self):
+        # self.text.delete(1.0, tk.END)
+        with open('resources/names.txt', 'r', encoding='utf-8') as f:
+            content = f.read()
+            self.text.config(state='normal')
+            self.text.insert(tk.END, content)
+            self.text.see(tk.END)
+            self.text.config(state='disabled')
+        self.update_status("New belligerent created")
         
     def open_file(self):
         self.update_status("Open file dialog would appear here")
@@ -57,6 +66,11 @@ class BattleWindow:
     def update_status(self, message):
         self.status.config(text=message)
         self.root.after(3000, lambda: self.status.config(text="Ready"))
+
+    def new_game(self):
+        self.text.delete(1.0, tk.END)
+        self.update_status("New simulation created")
+
 
 def main():
     root = tk.Tk()
