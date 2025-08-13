@@ -9,7 +9,7 @@ import math
 def get_random_name():
     with open('resources/names.txt', 'r', encoding='utf-8') as f:
         content = f.read()
-        names = content.split(" ")
+        names = content.split()
         name = random.choice(names)
         return name
 
