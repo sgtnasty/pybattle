@@ -1,6 +1,3 @@
-from tkinter import *
-import tkinter as tk
-from tkinter import ttk
 
 import tkinter as tk
 from tkinter import ttk
@@ -17,13 +14,13 @@ class BattleWindow:
         toolbar.pack(side=tk.TOP, fill=tk.X)
         
         # Toolbar buttons
-        self.new_btn = ttk.Button(toolbar, text="New", command=self.new_file)
+        self.new_btn = ttk.Button(toolbar, text="Add Player", command=self.new_file)
         self.new_btn.pack(side=tk.LEFT, padx=2, pady=2)
         
-        self.open_btn = ttk.Button(toolbar, text="Open", command=self.open_file)
+        self.open_btn = ttk.Button(toolbar, text="Randomize", command=self.open_file)
         self.open_btn.pack(side=tk.LEFT, padx=2, pady=2)
         
-        self.save_btn = ttk.Button(toolbar, text="Save", command=self.save_file)
+        self.save_btn = ttk.Button(toolbar, text="Run!", command=self.save_file)
         self.save_btn.pack(side=tk.LEFT, padx=2, pady=2)
         
         # Text widget in the center (with scrollbar)
