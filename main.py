@@ -5,6 +5,7 @@ import sys
 import random
 import time
 import math
+import logging
 
 
 def get_random_name():
@@ -39,7 +40,7 @@ class Player:
         self.location = Location()
 
     def __str__(self):
-        return f"{self.name}, Atk={self.attack}, Def={self.defense}, Loc=[{self.location}]"
+        return f"{self.name}, Atk={self.attack}, Def={self.defense}, Loc=[{self.location}], Arm={self.armor}"
 
     def randomize(self):
         self.attack.set(roll3d6())
@@ -86,6 +87,7 @@ class Player:
     def damage(self, target):
         damage_inflicted = roll3d6() + self.power.current_value
         target.armor.current_value -= damage_inflicted
+        return damage_inflicted
 
     def is_dead(self):
         if self.armor.current_value < 1:
@@ -210,16 +212,25 @@ class BattleWindow:
                 self.console_write(f"{player}\n")
                 self.text.see(tk.END)
                 target = self.game.getNearestEnemy(player)
-                player.moveTowards(target.location)
+                logging.info(f"{player.name} targets {target.name}")
                 if player.isWithinRangeForAttack(target):
+                    logging.info(f"{player.name} attacks {target.name}")
                     if player.attackTarget(target):
-                        player.damage(target)
+                        logging.info(f"{player.name} hits {target}")
+                        dam = player.damage(target)
+                        logging.info(f"{dam} points of damage")
                         if target.is_dead():
+                            logging.info(f"{target} is dead!")
                             self.game.players.remove(target)
+                else:
+                    logging.info(f"{player.name} moves towards {taregt.name}")
+                    player.moveTowards(target.location)
+
         self.console_write("game ended\n")
 
 
     def update_status(self, message):
+        logging.info(message)
         self.status.config(text=message)
         self.root.after(3000, lambda: self.status.config(text="Ready"))
 
@@ -242,6 +253,12 @@ class BattleWindow:
 
 
 def main():
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(levelname)s - %(message)s",
+        handlers=[logging.StreamHandler()]  # Log to console
+    )
+    logging.info("battle/2.1.0")
     random.seed(time.time())
     root = tk.Tk()
     app = BattleWindow(root)
