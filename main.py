@@ -248,6 +248,7 @@ class BattleWindow:
                 else:
                     logging.info(f"{player.name} moves towards {target.name}")
                     player.moveTowards(target.location)
+                self.root.dooneevent()
         self.console_write(f"game ended in {self.game.turns} turns\n")
         self.console_write(f"winner is {self.game.players[0]}")
         logging.info(f"winner is {self.game.players[0]}")
