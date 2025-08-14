@@ -8,6 +8,9 @@ import math
 import logging
 
 
+MAXTURNS = 256
+
+
 def get_random_name():
     with open('resources/names.txt', 'r', encoding='utf-8') as f:
         content = f.read()
@@ -216,6 +219,10 @@ class BattleWindow:
         self.text.config(state='normal')
         while len(self.game.players) > 1:
             self.game.turns += 1
+            logging.info(f"Turn {self.game.turns}")
+            if self.game.turns > MAXTURNS:
+                logging.warn(f"Battle is taking too many turns: {self.game.turns}")
+                break
             for player in self.game.players:
                 self.console_write(f"{player}\n")
                 self.text.see(tk.END)
