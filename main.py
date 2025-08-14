@@ -27,6 +27,11 @@ def roll3d6():
     return d1 + d2 + d3
 
 
+def roll1d8():
+    d1 = random.randint(1, 8)
+    return d1
+
+
 def roll1d20():
     d1 = random.randint(1, 20)
     return d1
@@ -91,7 +96,7 @@ class Player:
         return False
 
     def damage(self, target):
-        damage_inflicted = roll3d6() + self.power.current_value
+        damage_inflicted = roll1d8() + self.power.bonus()
         target.armor.current_value -= damage_inflicted
         return damage_inflicted
 
@@ -220,6 +225,7 @@ class BattleWindow:
         while len(self.game.players) > 1:
             self.game.turns += 1
             logging.info(f"Turn {self.game.turns}")
+            self.console_write(f"Turn {self.game.turns}\n")
             if self.game.turns > MAXTURNS:
                 logging.warn(f"Battle is taking too many turns: {self.game.turns}")
                 break
@@ -244,6 +250,7 @@ class BattleWindow:
                     player.moveTowards(target.location)
         self.console_write(f"game ended in {self.game.turns} turns\n")
         self.console_write(f"winner is {self.game.players[0]}")
+        logging.info(f"winner is {self.game.players[0]}")
 
 
     def update_status(self, message):
