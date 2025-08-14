@@ -249,9 +249,13 @@ class BattleWindow:
                     logging.info(f"{player.name} moves towards {target.name}")
                     player.moveTowards(target.location)
                 self.root.dooneevent()
-        self.console_write(f"game ended in {self.game.turns} turns\n")
-        self.console_write(f"winner is {self.game.players[0]}")
-        logging.info(f"winner is {self.game.players[0]}")
+        if len(self.game.players) > 1:
+            self.console_write(f"inconclusive result\n")
+            logging.warn("inconclusive result")
+        else:
+            self.console_write(f"game ended in {self.game.turns} turns\n")
+            self.console_write(f"winner is {self.game.players[0]}")
+            logging.info(f"winner is {self.game.players[0]}")
 
 
     def update_status(self, message):
