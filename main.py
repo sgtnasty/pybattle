@@ -74,6 +74,7 @@ class Player:
         new_y = self.location.y + dy_normalized * self.speed.current_value
         self.location.x = new_x
         self.location.y = new_y
+        logging.debug(f"{self.name} moved {self.location}")
 
     def isWithinRangeForAttack(self, target):
         range = self.location.distance(target.location)
@@ -93,8 +94,8 @@ class Player:
 
     def is_dead(self):
         if self.armor.current_value < 1:
-            True
-        False
+            return True
+        return False
 
 
 class PlayerAttribute:
@@ -223,7 +224,7 @@ class BattleWindow:
                         dam = player.damage(target)
                         logging.info(f"{dam} points of damage")
                         if target.is_dead():
-                            logging.info(f"{target} is dead!")
+                            logging.info(f"{player.name} defeated {target}!")
                             self.game.players.remove(target)
                 else:
                     logging.info(f"{player.name} moves towards {target.name}")
