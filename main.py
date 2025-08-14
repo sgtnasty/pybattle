@@ -1,6 +1,7 @@
 
 import tkinter as tk
 from tkinter import ttk
+import sys
 import random
 import time
 import math
@@ -35,6 +36,7 @@ class Player:
         self.power = PlayerAttribute("Power")
         self.speed = PlayerAttribute("Speed")
         self.range = PlayerAttribute("Range")
+        self.location = Location()
 
     def __str__(self):
         return f"{self.name}, Atk={self.attack}, Def={self.defense}, Loc=[{self.location}]"
@@ -46,9 +48,50 @@ class Player:
         self.power.set(roll3d6())
         self.speed.set(roll3d6())
         self.range.set(roll3d6())
-        self.location = Location()
         self.location.randomize()
+
+    def moveTowards(target):
+        # Calculate direction vector (dx, dy)
+        dx = target.location.x - self.location.X
+        dy = target.location.y = self.location.Y
+
+        # Calculate distance between points
+        distance = math.hypot(dx, dy)
+
+        # If already at (or very close to) the target, return target
+        if distance <= self.speed.current_value:
+            return
+
+        # Normalize direction vector and scale by speed
+        dx_normalized = dx / distance
+        dy_normalized = dy / distance
     
+        # Calculate new position
+        new_x = x1 + dx_normalized * self.speed.current_value
+        new_y = y1 + dy_normalized * self.speed.current_value
+        self.location.x = new_x
+        self.location.y = new_y
+
+    def isWithinRangeForAttack(self, target):
+        range = self.location.distance(target.location)
+        return range <= self.range
+
+    def attack(self, target):
+        roll = roll1d20()
+        if (self.attack + roll) >= target.defense.current_value:
+            # we have a hit!
+            return True
+        return False
+
+    def damage(self, target):
+        damage_inflicted = roll3d6() + self.power.current_value
+        target.armor.current_value -= damage_inflicted
+
+    def is_dead(self):
+        if self.armor.current_value < 1:
+            True
+        False
+
 
 class PlayerAttribute:
     def __init__(self, name, cv=0, bv=0):
@@ -85,12 +128,29 @@ class Location:
         return f"x{self.x}, y{self.y}"
 
 
+class Game:
+    def __init__(self):
+        self.turns = 0
+        self.players = []
+
+    def getNearestEnemy(self, source):
+        min_dist = sys.float_info.max
+        target = None
+        for player in self.players:
+            if player.name != player.name:
+                distance = player.location.distance(source.location)
+                if distance < min_dist:
+                    target = player
+                    min_dist = distance
+        return target
+
+
 class BattleWindow:
     def __init__(self, root):
         self.root = root
         self.root.title("battle 2.0")
         self.create_widgets()
-        self.players = []
+        self.game = Game()
         
     def create_widgets(self):
         # Create toolbar with 3 buttons
@@ -133,36 +193,51 @@ class BattleWindow:
         
     def add_player(self):
         name = get_random_name()
-        self.players.append(Player(name))
-        self.text.config(state='normal')
-        self.text.insert(tk.END, f"{name}\n")
-        self.text.see(tk.END)
-        self.text.config(state='disabled')
+        self.game.players.append(Player(name))
+        self.console_write(f"{name}\n")
         self.update_status(f"New belligerent {name}, created")
         
     def randomize(self):
         self.update_status("Randomizing the players attributes...")
-        for player in self.players:
+        for player in self.game.players:
             player.randomize()
         
     def runsim(self):
         self.update_status("Running simulation...")
         self.text.config(state='normal')
-        for player in self.players:
-            self.text.insert(tk.END, f"{player}\n")
+        for player in self.game.players:
+            self.console_write(f"{player}\n")
             self.text.see(tk.END)
-        self.text.config(state='disabled')
+            target = self.game.getNearestEnemy(player)
+            player.moveTowards(target.location)
+            if player.isWithinRangeForAttack(target):
+                if player.attack(target):
+                    player.damage(target)
+                    if target.is_dead():
+                        self.game.players.remove(target)
+        self.console_write("game ended\n")
+
 
     def update_status(self, message):
         self.status.config(text=message)
         self.root.after(3000, lambda: self.status.config(text="Ready"))
 
     def new_game(self):
-        self.players = []
+        self.game = Game()
+        self.console_clear()
+        self.console_write("new game\n")
+        self.update_status("New simulation created")
+
+    def console_write(self, message):
+        self.text.config(state='normal')
+        self.text.insert(tk.END, message)
+        self.text.see(tk.END)
+        self.text.config(state='disabled')
+
+    def console_clear(self):
         self.text.config(state='normal')
         self.text.delete(1.0, tk.END)
         self.text.config(state='disabled')
-        self.update_status("New simulation created")
 
 
 def main():
