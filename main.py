@@ -50,10 +50,10 @@ class Player:
         self.range.set(roll3d6())
         self.location.randomize()
 
-    def moveTowards(target):
+    def moveTowards(self, location):
         # Calculate direction vector (dx, dy)
-        dx = target.location.x - self.location.X
-        dy = target.location.y = self.location.Y
+        dx = location.x - self.location.x
+        dy = location.y = self.location.y
 
         # Calculate distance between points
         distance = math.hypot(dx, dy)
@@ -67,18 +67,18 @@ class Player:
         dy_normalized = dy / distance
     
         # Calculate new position
-        new_x = x1 + dx_normalized * self.speed.current_value
-        new_y = y1 + dy_normalized * self.speed.current_value
+        new_x = self.location.x + dx_normalized * self.speed.current_value
+        new_y = self.location.y + dy_normalized * self.speed.current_value
         self.location.x = new_x
         self.location.y = new_y
 
     def isWithinRangeForAttack(self, target):
         range = self.location.distance(target.location)
-        return range <= self.range
+        return range <= self.range.current_value
 
-    def attack(self, target):
+    def attackTarget(self, target):
         roll = roll1d20()
-        if (self.attack + roll) >= target.defense.current_value:
+        if (self.attack.current_value + roll) >= target.defense.current_value:
             # we have a hit!
             return True
         return False
@@ -137,7 +137,7 @@ class Game:
         min_dist = sys.float_info.max
         target = None
         for player in self.players:
-            if player.name != player.name:
+            if source.name != player.name:
                 distance = player.location.distance(source.location)
                 if distance < min_dist:
                     target = player
@@ -205,16 +205,17 @@ class BattleWindow:
     def runsim(self):
         self.update_status("Running simulation...")
         self.text.config(state='normal')
-        for player in self.game.players:
-            self.console_write(f"{player}\n")
-            self.text.see(tk.END)
-            target = self.game.getNearestEnemy(player)
-            player.moveTowards(target.location)
-            if player.isWithinRangeForAttack(target):
-                if player.attack(target):
-                    player.damage(target)
-                    if target.is_dead():
-                        self.game.players.remove(target)
+        while len(self.game.players) > 1:
+            for player in self.game.players:
+                self.console_write(f"{player}\n")
+                self.text.see(tk.END)
+                target = self.game.getNearestEnemy(player)
+                player.moveTowards(target.location)
+                if player.isWithinRangeForAttack(target):
+                    if player.attackTarget(target):
+                        player.damage(target)
+                        if target.is_dead():
+                            self.game.players.remove(target)
         self.console_write("game ended\n")
 
 
