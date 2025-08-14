@@ -208,6 +208,7 @@ class BattleWindow:
         self.update_status("Running simulation...")
         self.text.config(state='normal')
         while len(self.game.players) > 1:
+            self.game.turns += 1
             for player in self.game.players:
                 self.console_write(f"{player}\n")
                 self.text.see(tk.END)
@@ -226,7 +227,7 @@ class BattleWindow:
                     logging.info(f"{player.name} moves towards {taregt.name}")
                     player.moveTowards(target.location)
 
-        self.console_write("game ended\n")
+        self.console_write(f"game ended in {self.game.turns} turns\n")
 
 
     def update_status(self, message):
