@@ -11,6 +11,26 @@ import logging
 MAXTURNS = 256
 
 
+def show_about():
+    about_window = tk.Toplevel()
+    about_window.title("About")
+    about_window.resizable(False, False)
+    
+    # Application info
+    tk.Label(about_window, text="Battle", font=("Arial", 14, "bold")).pack(pady=10)
+    tk.Label(about_window, text="Version 2.1.0").pack()
+    tk.Label(about_window, text="© 2025 Ronaldo Nascimento").pack(pady=10)
+    
+    # Add a separator
+    ttk.Separator(about_window, orient='horizontal').pack(fill='x', padx=20, pady=5)
+    
+    # Add credits/license
+    tk.Label(about_window, text="This software is licensed under MIT License").pack()
+    
+    # Close button
+    tk.Button(about_window, text="OK", command=about_window.destroy).pack(pady=10)
+
+
 def get_random_name():
     with open('resources/names.txt', 'r', encoding='utf-8') as f:
         content = f.read()
@@ -142,7 +162,7 @@ class Location:
         self.z = 0.0
 
     def __str__(self):
-        return f"x{self.x}, y{self.y}"
+        return f"x{self.x:.2f}, y{self.y:.2f}"
 
 
 class Game:
@@ -186,6 +206,9 @@ class BattleWindow:
 
         self.new_btn = ttk.Button(toolbar, text="New Game", command=self.new_game)
         self.new_btn.pack(side=tk.RIGHT, padx=2, pady=2)
+
+        self.abt_btn = ttk.Button(toolbar, text="About", command=show_about)
+        self.abt_btn.pack(side=tk.RIGHT, padx=2, pady=2)
         
         # Text widget in the center (with scrollbar)
         text_frame = tk.Frame(self.root)
@@ -234,14 +257,18 @@ class BattleWindow:
                 self.text.see(tk.END)
                 target = self.game.getNearestEnemy(player)
                 logging.info(f"{player.name} targets {target.name}")
+                self.console_write(f"{player.name} targets {target.name}\n")
                 if player.isWithinRangeForAttack(target):
                     logging.info(f"{player.name} attacks {target.name}")
+                    self.console_write(f"{player.name} attacks {target.name}\n")
                     if player.attackTarget(target):
                         logging.info(f"{player.name} hits {target}")
+                        self.console_write(f"{player.name} hits {target}\n")
                         dam = player.damage(target)
                         logging.info(f"{dam} points of damage")
                         if target.is_dead():
                             logging.info(f"{player.name} defeated {target}!")
+                            self.console_write(f"{player.name} defeated {target}!\n")
                             self.game.players.remove(target)
                     else:
                         logging.info(f"{player.name} missed {target.name}")
@@ -254,7 +281,7 @@ class BattleWindow:
             logging.warn("inconclusive result")
         else:
             self.console_write(f"game ended in {self.game.turns} turns\n")
-            self.console_write(f"winner is {self.game.players[0]}")
+            self.console_write(f"winner is {self.game.players[0]}\n")
             logging.info(f"winner is {self.game.players[0]}")
 
 
