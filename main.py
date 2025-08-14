@@ -20,6 +20,7 @@ def roll3d6():
     d1 = random.randint(1, 6)
     d2 = random.randint(1, 6)
     d3 = random.randint(1, 6)
+    logging.debug(f"roll 3d6 = {d1} {d2} {d3}")
     return d1 + d2 + d3
 
 
@@ -50,6 +51,7 @@ class Player:
         self.speed.set(roll3d6())
         self.range.set(roll3d6())
         self.location.randomize()
+        logging.debug(f"{self.name}=[{self.attack} {self.defense} {self.armor} {self.power} {self.speed} {self.range} @({self.location})]")
 
     def moveTowards(self, location):
         # Calculate direction vector (dx, dy)
@@ -224,7 +226,7 @@ class BattleWindow:
                             logging.info(f"{target} is dead!")
                             self.game.players.remove(target)
                 else:
-                    logging.info(f"{player.name} moves towards {taregt.name}")
+                    logging.info(f"{player.name} moves towards {target.name}")
                     player.moveTowards(target.location)
 
         self.console_write(f"game ended in {self.game.turns} turns\n")
@@ -255,7 +257,7 @@ class BattleWindow:
 
 def main():
     logging.basicConfig(
-        level=logging.INFO,
+        level=logging.DEBUG,
         format="%(asctime)s - %(levelname)s - %(message)s",
         handlers=[logging.StreamHandler()]  # Log to console
     )
