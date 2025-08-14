@@ -20,7 +20,7 @@ def roll3d6():
     d1 = random.randint(1, 6)
     d2 = random.randint(1, 6)
     d3 = random.randint(1, 6)
-    logging.debug(f"roll 3d6 = {d1} {d2} {d3}")
+    # logging.debug(f"roll 3d6 = {d1} {d2} {d3}")
     return d1 + d2 + d3
 
 
@@ -82,7 +82,7 @@ class Player:
 
     def attackTarget(self, target):
         roll = roll1d20()
-        if (self.attack.current_value + roll) >= target.defense.current_value:
+        if (self.attack.bonus() + roll) >= target.defense.current_value:
             # we have a hit!
             return True
         return False
@@ -107,6 +107,10 @@ class PlayerAttribute:
     def set(self, base_value):
         self.base_value = base_value
         self.current_value = base_value
+
+    def bonus(self):
+        bv = int((self.current_value -10.5)/2.0)
+        return bv
 
     def __str__(self):
         return f"{self.current_value}"
@@ -226,11 +230,13 @@ class BattleWindow:
                         if target.is_dead():
                             logging.info(f"{player.name} defeated {target}!")
                             self.game.players.remove(target)
+                    else:
+                        logging.info(f"{player.name} missed {target.name}")
                 else:
                     logging.info(f"{player.name} moves towards {target.name}")
                     player.moveTowards(target.location)
-
         self.console_write(f"game ended in {self.game.turns} turns\n")
+        self.console_write(f"winner is {self.game.players[0]}")
 
 
     def update_status(self, message):
