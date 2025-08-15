@@ -9,6 +9,7 @@ import logging
 
 
 MAXTURNS = 256
+VERSION = "2.1.0"
 
 
 def show_about():
@@ -18,7 +19,7 @@ def show_about():
     
     # Application info
     tk.Label(about_window, text="Battle", font=("Arial", 14, "bold")).pack(pady=10)
-    tk.Label(about_window, text="Version 2.1.0").pack()
+    tk.Label(about_window, text=f"Version {VERSION}").pack()
     tk.Label(about_window, text="© 2025 Ronaldo Nascimento").pack(pady=10)
     
     # Add a separator
@@ -204,11 +205,11 @@ class BattleWindow:
         self.run_btn = ttk.Button(toolbar, text="Run!", command=self.runsim)
         self.run_btn.pack(side=tk.LEFT, padx=2, pady=2)
 
-        self.new_btn = ttk.Button(toolbar, text="New Game", command=self.new_game)
-        self.new_btn.pack(side=tk.RIGHT, padx=2, pady=2)
-
         self.abt_btn = ttk.Button(toolbar, text="About", command=show_about)
         self.abt_btn.pack(side=tk.RIGHT, padx=2, pady=2)
+
+        self.new_btn = ttk.Button(toolbar, text="New Game", command=self.new_game)
+        self.new_btn.pack(side=tk.RIGHT, padx=2, pady=2)
         
         # Text widget in the center (with scrollbar)
         text_frame = tk.Frame(self.root)
@@ -314,7 +315,7 @@ def main():
         format="%(asctime)s - %(levelname)s - %(message)s",
         handlers=[logging.StreamHandler()]  # Log to console
     )
-    logging.info("battle/2.1.0")
+    logging.info(f"battle/{VERSION}")
     random.seed(time.time())
     root = tk.Tk()
     app = BattleWindow(root)
