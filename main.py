@@ -242,39 +242,39 @@ class BattleWindow:
         self.update_status("Randomizing the players attributes...")
         for player in self.game.players:
             player.randomize()
+            self.update_status(f"{player}")
         
     def runsim(self):
         self.update_status("Running simulation...")
         self.text.config(state='normal')
         while len(self.game.players) > 1:
             self.game.turns += 1
-            logging.info(f"Turn {self.game.turns}")
+            self.update_status(f"Turn {self.game.turns}")
             self.console_write(f"Turn {self.game.turns}\n")
             if self.game.turns > MAXTURNS:
                 logging.warn(f"Battle is taking too many turns: {self.game.turns}")
                 break
             for player in self.game.players:
                 self.console_write(f"{player}\n")
-                self.text.see(tk.END)
                 target = self.game.getNearestEnemy(player)
-                logging.info(f"{player.name} targets {target.name}")
+                self.update_status(f"{player.name} targets {target.name}")
                 self.console_write(f"{player.name} targets {target.name}\n")
                 if player.isWithinRangeForAttack(target):
-                    logging.info(f"{player.name} attacks {target.name}")
+                    self.update_status(f"{player.name} attacks {target.name}")
                     self.console_write(f"{player.name} attacks {target.name}\n")
                     if player.attackTarget(target):
-                        logging.info(f"{player.name} hits {target}")
+                        self.update_status(f"{player.name} hits {target}")
                         self.console_write(f"{player.name} hits {target}\n")
                         dam = player.damage(target)
-                        logging.info(f"{dam} points of damage")
+                        self.update_status(f"{dam} points of damage")
                         if target.is_dead():
-                            logging.info(f"{player.name} defeated {target}!")
+                            self.update_status(f"{player.name} defeated {target}!")
                             self.console_write(f"{player.name} defeated {target}!\n")
                             self.game.players.remove(target)
                     else:
-                        logging.info(f"{player.name} missed {target.name}")
+                        self.update_status(f"{player.name} missed {target.name}")
                 else:
-                    logging.info(f"{player.name} moves towards {target.name}")
+                    self.update_status(f"{player.name} moves towards {target.name}")
                     player.moveTowards(target.location)
                 self.root.dooneevent()
         if len(self.game.players) > 1:
@@ -283,13 +283,13 @@ class BattleWindow:
         else:
             self.console_write(f"game ended in {self.game.turns} turns\n")
             self.console_write(f"winner is {self.game.players[0]}\n")
-            logging.info(f"winner is {self.game.players[0]}")
+            self.update_status(f"winner is {self.game.players[0]}")
 
 
     def update_status(self, message):
         logging.info(message)
         self.status.config(text=message)
-        self.root.after(3000, lambda: self.status.config(text="Ready"))
+        # self.root.after(3000, lambda: self.status.config(text="Ready"))
 
     def new_game(self):
         self.game = Game()
